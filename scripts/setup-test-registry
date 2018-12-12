@@ -17,7 +17,7 @@
 set -e
 
 REGISTRY_IMAGE="https://github.com/docker/distribution-library-image.git#update-alpine:arm64"
-REGISTRY_IMAGE_CONTAINER="test-ecs-registry:arm"
+REGISTRY_IMAGE_CONTAINER="amazon/registry"
 
 NGINX_IMAGE="nginx:1.15"
 
@@ -26,14 +26,14 @@ cd "${ROOT}"
 
 REGISTRY_CONTAINER_NAME=test-ecs-registry
 
-echo "Removing container"
+echo "Removing $REGISTRY_CONTAINER_NAME"
 # stop and remove the registry container. This will not throw a error if the container is not running
 docker stop "$REGISTRY_CONTAINER_NAME" || true && docker rm "$REGISTRY_CONTAINER_NAME" || true
 
-echo "Building container"
+echo "Building $REGISTRY_CONTAINER_NAME"
 docker build -t "${REGISTRY_IMAGE_CONTAINER}" "${REGISTRY_IMAGE}"
 
-echo "Running container"
+echo "Running $REGISTRY_CONTAINER_NAME"
 docker run -d --name="$REGISTRY_CONTAINER_NAME" -e SETTINGS_FLAVOR=local -p "127.0.0.1:51670:5000" "${REGISTRY_IMAGE_CONTAINER}"
 
 # Make sure our images are pushed to it
@@ -49,7 +49,7 @@ mirror_local_image() {
   docker rmi $2
 }
 
-for image in "amazon/amazon-ecs-netkitten" "amazon/amazon-ecs-volumes-test" "amazon/amazon-ecs-pid-namespace-test" "amazon/amazon-ecs-ipc-namespace-test" "amazon/squid" "amazon/awscli" "amazon/image-cleanup-test-image1" "amazon/image-cleanup-test-image2" "amazon/image-cleanup-test-image3" "amazon/fluentd" "amazon/amazon-ecs-agent-introspection-validator" "amazon/amazon-ecs-taskmetadata-validator" "amazon/amazon-ecs-v3-task-endpoint-validator"; do
+for image in "amazon/amazon-ecs-netkitten" "amazon/amazon-ecs-volumes-test" "amazon/amazon-ecs-pid-namespace-test" "amazon/amazon-ecs-ipc-namespace-test" "amazon/squid" "amazon/awscli" "amazon/image-cleanup-test-image1" "amazon/image-cleanup-test-image2" "amazon/image-cleanup-test-image3" "amazon/fluentd" "amazon/amazon-ecs-agent-introspection-validator" "amazon/amazon-ecs-taskmetadata-validator" "amazon/amazon-ecs-v3-task-endpoint-validator" "amazon/registry"; do
   mirror_local_image "${image}:make" "127.0.0.1:51670/${image}:latest"
 done
 
