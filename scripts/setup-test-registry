@@ -17,6 +17,7 @@
 set -e
 
 REGISTRY_IMAGE="https://github.com/docker/distribution-library-image.git#update-alpine:arm64"
+REGISTRY_IMAGE_CONTAINER="test-ecs-registry:arm"
 
 NGINX_IMAGE="nginx:1.15"
 
@@ -26,7 +27,7 @@ cd "${ROOT}"
 
 REGISTRY_CONTAINER_NAME=test-ecs-registry
 
-docker build -t "${REGISTRY_CONTAINER_NAME}" "${REGISTRY_IMAGE}"
+docker build -t "${REGISTRY_IMAGE_CONTAINER}" "${REGISTRY_IMAGE}"
 
 status=$(docker inspect -f "{{ .State.Running }}" "$REGISTRY_CONTAINER_NAME") || true
 
@@ -37,7 +38,7 @@ fi
 # This will fail if we already have one running, but that's fine. We'll see it
 # running and push our image to it to make sure it's there
 if [[ "$status" != "true" ]]; then
-	docker run -d --name="$REGISTRY_CONTAINER_NAME" -e SETTINGS_FLAVOR=local -p "127.0.0.1:51670:5000" "${REGISTRY_IMAGE}"
+	docker run -d --name="$REGISTRY_CONTAINER_NAME" -e SETTINGS_FLAVOR=local -p "127.0.0.1:51670:5000" "${REGISTRY_IMAGE_CONTAINER}"
 fi
 
 # Wait for it to be started which might include downloading the image
@@ -100,7 +101,7 @@ fi
 
 PARALLEL_PULL_FTS_MONGO="mongo:4.1"
 PARALLEL_PULL_FTS_REDIS="redis:5.0"
-PARALLEL_PULL_FTS_REGISTRY=${REGISTRY_IMAGE}
+PARALLEL_PULL_FTS_REGISTRY=${REGISTRY_IMAGE_CONTAINER}
 
 mirror_image ${BUSYBOX_IMAGE} "127.0.0.1:51670/busybox:latest"
 mirror_image ${NGINX_IMAGE} "127.0.0.1:51670/nginx:latest"
