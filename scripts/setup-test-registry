@@ -49,7 +49,7 @@ mirror_local_image() {
   docker rmi $2
 }
 
-for image in "amazon/amazon-ecs-netkitten" "amazon/amazon-ecs-volumes-test" "amazon/amazon-ecs-pid-namespace-test" "amazon/amazon-ecs-ipc-namespace-test" "amazon/squid" "amazon/awscli" "amazon/image-cleanup-test-image1" "amazon/image-cleanup-test-image2" "amazon/image-cleanup-test-image3" "amazon/fluentd" "amazon/amazon-ecs-agent-introspection-validator" "amazon/amazon-ecs-taskmetadata-validator" "amazon/amazon-ecs-v3-task-endpoint-validator" "amazon/registry"; do
+for image in "amazon/amazon-ecs-netkitten" "amazon/amazon-ecs-volumes-test" "amazon/amazon-ecs-pid-namespace-test" "amazon/amazon-ecs-ipc-namespace-test" "amazon/squid" "amazon/awscli" "amazon/image-cleanup-test-image1" "amazon/image-cleanup-test-image2" "amazon/image-cleanup-test-image3" "amazon/fluentd" "amazon/amazon-ecs-agent-introspection-validator" "amazon/amazon-ecs-taskmetadata-validator" "amazon/amazon-ecs-v3-task-endpoint-validator"; do
   mirror_local_image "${image}:make" "127.0.0.1:51670/${image}:latest"
 done
 
@@ -94,7 +94,8 @@ mirror_image ${PARALLEL_PULL_FTS_HTTPD} "127.0.0.1:51670/httpd:parallel-pull-fts
 mirror_image ${PARALLEL_PULL_FTS_MONGO} "127.0.0.1:51670/mongo:parallel-pull-fts"
 mirror_image ${PARALLEL_PULL_FTS_NGINX} "127.0.0.1:51670/nginx:parallel-pull-fts"
 mirror_image ${PARALLEL_PULL_FTS_REDIS} "127.0.0.1:51670/redis:parallel-pull-fts"
-mirror_image ${PARALLEL_PULL_FTS_REGISTRY} "127.0.0.1:51670/registry:parallel-pull-fts"
+mirror_local_image ${PARALLEL_PULL_FTS_REGISTRY} "127.0.0.1:51670/registry:parallel-pull-fts"
+
 
 # Now setup a v2 registry with auth... aka nginx with basic auth in front of it
 REGISTRY_AUTH_CONTAINER_NAME="test-ecs-registry-auth"
