@@ -24,39 +24,17 @@ NGINX_IMAGE="nginx:1.15"
 ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 cd "${ROOT}"
 
-
 REGISTRY_CONTAINER_NAME=test-ecs-registry
 
+echo "Removing container"
+# stop and remove the registry container. This will not throw a error if the container is not running
+docker stop "$REGISTRY_CONTAINER_NAME" || true && docker rm "$REGISTRY_CONTAINER_NAME" || true
+
+echo "Building container"
 docker build -t "${REGISTRY_IMAGE_CONTAINER}" "${REGISTRY_IMAGE}"
 
-status=$(docker inspect -f "{{ .State.Running }}" "$REGISTRY_CONTAINER_NAME") || true
-
-if [[ "$status" == "false" ]]; then
-	docker rm -f "$REGISTRY_CONTAINER_NAME"
-fi
-
-# This will fail if we already have one running, but that's fine. We'll see it
-# running and push our image to it to make sure it's there
-if [[ "$status" != "true" ]]; then
-	docker run -d --name="$REGISTRY_CONTAINER_NAME" -e SETTINGS_FLAVOR=local -p "127.0.0.1:51670:5000" "${REGISTRY_IMAGE_CONTAINER}"
-fi
-
-# Wait for it to be started which might include downloading the image
-status="false"
-for try in $(seq 1 300); do
-	status=$(docker inspect -f "{{ .State.Running }}" $REGISTRY_CONTAINER_NAME)
-	if [[ "$status" == "true" ]]; then
-		break
-	fi
-	sleep 1
-done
-
-if [[ "$status" != "true" ]]; then
-	echo "Unable to start test registry"
-	exit 1
-fi
-
-sleep 2
+echo "Running container"
+docker run -d --name="$REGISTRY_CONTAINER_NAME" -e SETTINGS_FLAVOR=local -p "127.0.0.1:51670:5000" "${REGISTRY_IMAGE_CONTAINER}"
 
 # Make sure our images are pushed to it
 mirror_image() {
@@ -65,6 +43,7 @@ mirror_image() {
 }
 
 mirror_local_image() {
+  echo "Mirroring $1"
   docker tag $1 $2
   docker push $2
   docker rmi $2

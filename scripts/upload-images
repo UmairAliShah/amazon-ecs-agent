@@ -84,8 +84,9 @@ for image in "executionrole" "busybox" "nginx" "python" "ubuntu" "consul" "debia
   fi
 done
 
-REGISTRY_IMAGE_CONTAINER=test-ecs-registry
+REGISTRY_CONTAINER_NAME=test-ecs-registry
 REGISTRY_IMAGE="https://github.com/docker/distribution-library-image.git#update-alpine:arm64"
+REGISTRY_IMAGE_CONTAINER="test-ecs-registry:arm"
 
 docker build -t "${REGISTRY_IMAGE_CONTAINER}" "${REGISTRY_IMAGE}"
 
