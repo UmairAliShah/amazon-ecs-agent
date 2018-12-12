@@ -16,7 +16,7 @@
 # Also push images we will need to it.
 set -e
 
-REGISTRY_IMAGE="registry:2.6.2"
+REGISTRY_IMAGE="https://github.com/docker/distribution-library-image.git#update-alpine:arm64"
 
 NGINX_IMAGE="nginx:1.15"
 
@@ -25,6 +25,9 @@ cd "${ROOT}"
 
 
 REGISTRY_CONTAINER_NAME=test-ecs-registry
+
+docker build -t "${REGISTRY_CONTAINER_NAME}" "${REGISTRY_IMAGE}"
+
 status=$(docker inspect -f "{{ .State.Running }}" "$REGISTRY_CONTAINER_NAME") || true
 
 if [[ "$status" == "false" ]]; then
