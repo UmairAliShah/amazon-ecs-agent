@@ -17,7 +17,7 @@
 set -e
 
 REGISTRY_IMAGE="https://github.com/docker/distribution-library-image.git#update-alpine:arm64"
-REGISTRY_IMAGE_CONTAINER="amazon/registry"
+REGISTRY_IMAGE_CONTAINER="test-ecs-registry"
 
 NGINX_IMAGE="nginx:1.15"
 
